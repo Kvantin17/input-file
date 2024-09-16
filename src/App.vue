@@ -1,15 +1,35 @@
 <script setup lang="ts">
 import FileLoader from "./components/FileLoader.vue";
+
+const customLoad = async () => {
+  const src = await new Promise((resolve) => {
+    const url =
+      "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg";
+    setTimeout(() => resolve(url), 500);
+  });
+
+  return src;
+};
 </script>
 
 <template>
   <main>
     <FileLoader
-      :width="300"
-      :height="200"
+      :width="200"
+      :height="300"
       fileType="image"
       :inputAttrs="{
-        multiple: 2,
+        multiple: false,
+        accept: ['.png'],
+      }"
+      :onUpload="customLoad"
+    />
+    <FileLoader
+      :width="200"
+      :height="300"
+      fileType="image"
+      :inputAttrs="{
+        multiple: false,
         accept: ['.png'],
       }"
     />
@@ -18,7 +38,7 @@ import FileLoader from "./components/FileLoader.vue";
       :height="300"
       fileType="video"
       :inputAttrs="{
-        multiple: 1,
+        multiple: true,
         accept: ['.mp4', '.webm'],
       }"
     />
@@ -27,7 +47,7 @@ import FileLoader from "./components/FileLoader.vue";
       :height="300"
       fileType="document"
       :inputAttrs="{
-        multiple: 1,
+        multiple: true,
         accept: ['.pdf'],
       }"
     />
