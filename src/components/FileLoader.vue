@@ -3,7 +3,7 @@
     :style="{
       width: width + 'px',
       height: height + 'px',
-      backgroundImage: uploadedUrl ? `url(${uploadedUrl})` : 'none',
+      backgroundImage: uploadedUrl && showImg ? `url(${uploadedUrl})` : 'none',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
@@ -20,9 +20,9 @@
       />
       <div v-if="loading" class="container-loader">Loading...</div>
       <div v-else class="container-content">
-        <div v-if="files.length > 0">
+        <div v-if="files.length">
           <button class="container-remove" @click="removeFiles">x</button>
-          <div v-if="fileType === 'image' && uploadedUrl">
+          <div v-if="fileType === 'image' && uploadedUrl && showImg">
             <img :src="uploadedUrl" alt="Preview" class="container-preview" />
           </div>
           <div v-else>
@@ -60,15 +60,20 @@ const props = defineProps({
     type: Object as PropType<{ multiple: boolean; accept: string[] }>,
     required: true,
   },
+  // 1.чтобы управлять компонентом из функции, которые мы передаем в props я точно описал,что должно приходить из этой функции
   onUpload: {
-    type: Function as PropType<(file: File) => Promise<string>>,
+    type: Function as PropType<
+      (file: File) => Promise<{ url: string; showImage: boolean }>
+    >,
     required: false,
   },
 });
 
 const files = ref<File[]>([]);
 const uploadedUrl = ref<string | null>(null);
-const loading = ref(false);
+const loading = ref<boolean>(false);
+// 2.определил переменную для хранения данных кооторые приходят из функции
+const showImg = ref<boolean>(true);
 
 const handleFileSelect = async (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -80,7 +85,12 @@ const handleFileSelect = async (event: Event) => {
       files.value = [file];
 
       if (props.onUpload) {
-        uploadedUrl.value = await props.onUpload(file);
+        // 3.и деструктуризацией достал данные
+        const { url, showImage } = await props.onUpload(file);
+        // Когда я попробовал с тобой это сделать почти то же самое, ты сказал, что название переменных будт определяться вспомогательной функцией, а не в компоненте.
+        // Однако благодаря тому, что я тайпскриптом определил, какие переменные должны приходить, эта проблема решена. Надеюсь....))
+        uploadedUrl.value = url;
+        showImg.value = showImage;
       } else {
         uploadedUrl.value = URL.createObjectURL(file);
       }
@@ -95,6 +105,7 @@ const handleFileSelect = async (event: Event) => {
 const removeFiles = () => {
   files.value = [];
   uploadedUrl.value = null;
+  showImg.value = true;
 };
 </script>
 

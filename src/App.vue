@@ -5,7 +5,8 @@ const customLoad = async () => {
   const src = await new Promise((resolve) => {
     const url =
       "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg";
-    setTimeout(() => resolve(url), 500);
+    const showImage = true;
+    setTimeout(() => resolve({ url, showImage }), 500);
   });
 
   return src;
