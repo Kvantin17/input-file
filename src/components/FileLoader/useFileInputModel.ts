@@ -29,7 +29,7 @@ export function useFileInputModel({
     }
   };
 
-  const removeImage = () => {
+  const hideImage = () => {
     if (isImage) {
       isImgShown.value = false;
     }
@@ -55,7 +55,7 @@ export function useFileInputModel({
     showLoader,
     hideLoader,
     renderImage,
-    removeImage,
+    hideImage,
     parseFile,
     removeFile,
     file,
