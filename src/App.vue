@@ -1,33 +1,54 @@
 <script setup lang="ts">
-import FileLoader from "./components/FileLoader.vue";
+import FileLoader from "./components/FileLoader/index.vue";
+import { useFileInputModel } from "./components/FileLoader/useFileInputModel";
 
-const customLoad = async () => {
-  const src = await new Promise((resolve) => {
-    const url =
-      "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg";
-    const showImage = true;
-    setTimeout(() => resolve({ url, showImage }), 500);
-  });
+const customLoad = async (
+  file: object,
+  model: ReturnType<typeof useFileInputModel>
+) => {
+  const { showLoader, hideLoader } = model;
 
-  return src;
+  try {
+    showLoader();
+    const src = await new Promise((resolve) => {
+      const url =
+        "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg";
+      setTimeout(() => resolve(url), 500);
+    });
+    return src;
+  } catch (error) {
+    throw new Error("Error");
+  } finally {
+    hideLoader();
+  }
+};
+
+const consoleLogFile = (file: File) => {
+  console.log(file);
+};
+
+const consoleLogFiles = (files: File[]) => {
+  console.log(files);
 };
 </script>
 
 <template>
   <main>
     <FileLoader
-      :width="200"
-      :height="300"
+      width="200px"
+      height="300px"
       fileType="image"
       :inputAttrs="{
         multiple: false,
         accept: ['.png'],
       }"
-      :onUpload="customLoad"
+      :customLoad="customLoad"
+      @select-file="consoleLogFile"
+      @select-files="consoleLogFiles"
     />
     <FileLoader
-      :width="200"
-      :height="300"
+      width="2rem"
+      height="4rem"
       fileType="image"
       :inputAttrs="{
         multiple: false,
@@ -35,8 +56,8 @@ const customLoad = async () => {
       }"
     />
     <FileLoader
-      :width="500"
-      :height="300"
+      width="500px"
+      height="300px"
       fileType="video"
       :inputAttrs="{
         multiple: true,
@@ -44,8 +65,8 @@ const customLoad = async () => {
       }"
     />
     <FileLoader
-      :width="500"
-      :height="300"
+      width="500px"
+      height="300px"
       fileType="document"
       :inputAttrs="{
         multiple: true,
